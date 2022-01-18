@@ -481,3 +481,29 @@ In my client app I add some code like:
 ````
 
 For every authenticated request I use now "axiosJWT" instead of "axios"
+
+## Further Strapi modifications
+
+In Strapi we need to configure CORS by changing the file config/middleware.js
+
+```
+module.exports = [
+  'strapi::errors',
+  'strapi::security',
+  // 'strapi::cors',
+  {
+    name: 'strapi::cors',
+    config: {
+      enabled: true,
+      headers: ['Access-Control-Allow-Headers', 'withCredentials', 'Origin', 'Authorization', 'Accept', 'X-Requested-With', 'Content-Type', 'Access-Control-Request-Method', 'Access-Control-Request-Headers'],
+      origin: ['http://localhost:3000', 'http://localhost:1337']
+    }
+  },
+  'strapi::poweredBy',
+  'strapi::logger',
+  'strapi::query',
+  'strapi::body',
+  'strapi::favicon',
+  'strapi::public',
+];
+```
