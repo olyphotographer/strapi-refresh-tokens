@@ -437,6 +437,21 @@ In my client app I add some code like:
 
   .......
 
+
+
+  const getRefreshToken = async () => {
+    try {
+      //   console.log("getRefreshToken");
+      let API = process.env.REACT_APP_BACKEND_URL
+
+      const res = await axios.post(`${API}/token/refresh`, { withCredentials: true });
+
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   axiosJWT.interceptors.request.use(
     async (config) => {
       const accessToken = getAccessToken()    // from local storage
