@@ -135,8 +135,8 @@ module.exports = (plugin) => {
                                 }); */
 
 
-
-                ctx.cookies.set("refreshToken", issueRefeshToken({ id: user.id }), {
+                const refreshToken = issueRefeshToken({ id: user.id })
+                ctx.cookies.set("refreshToken", refreshToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production" ? true : false,
                     maxAge: 1000 * 60 * 60 * 24 * 14, // 14 Day Age
@@ -148,6 +148,7 @@ module.exports = (plugin) => {
                 });
                 ctx.send({
                     jwt: issueJWT({ id: user.id }, { expiresIn: process.env.JWT_SECRET_EXPIRES }),
+                    refreshToken: refreshToken,
                     /*                     jwt: getService('jwt').issue({
                                             id: user.id,
                                         }), */
@@ -189,11 +190,27 @@ module.exports = (plugin) => {
     plugin.controllers.auth['refreshToken'] = async (ctx) => {
         // get token from the POST request
         const store = await strapi.store({ type: 'plugin', name: 'users-permissions' });
+
+        // either as Cookie or in the body as refreshToken
+        const { refreshToken } = ctx.request.body;
+
         const refreshCookie = ctx.cookies.get("refreshToken")
+
         console.log(refreshCookie)
-        if (!refreshCookie) {
+        if (!refreshCookie && !refreshToken) {
             return ctx.badRequest("no Authorization");
         }
+        if (!refreshCookie) {
+            if (refreshToken) {
+                // in case we get the token in the body
+                refreshCookie = refreshToken
+            }
+            else {
+                return ctx.badRequest("no Authorization");
+            }
+        }
+
+
         try {
             const obj = await verifyRefreshToken(refreshCookie);
             console.log(obj)
