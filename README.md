@@ -233,7 +233,7 @@ the code looks now like
                     secure: process.env.NODE_ENV === "production" ? true : false,
                     maxAge: 1000 * 60 * 60 * 24 * 14, // 14 Day Age
                     domain: "localhost",
-                    SameSite: "restrict"
+                    sameSite: "strict"
                 });
                 ctx.send({
                     jwt: issueJWT({ id: user.id }, { expiresIn: process.env.JWT_SECRET_EXPIRES }),
