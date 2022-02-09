@@ -231,8 +231,20 @@ module.exports = (plugin) => {
             if (user.blocked === true) {
                 throw new ApplicationError('Your account has been blocked by an administrator');
             }
+            const refreshToken = issueRefeshToken({ id: user.id })
+            ctx.cookies.set("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production" ? true : false,
+                maxAge: 1000 * 60 * 60 * 24 * 14, // 14 Day Age
+                domain:
+                    process.env.NODE_ENV === "development"
+                        ? "localhost"
+                        : process.env.PRODUCTION_URL,
+                sameSite: "strict"
+            });
             ctx.send({
                 jwt: issueJWT({ id: obj.id }, { expiresIn: process.env.JWT_SECRET_EXPIRES }),
+                refreshToken: refreshToken,
                 /*                     jwt: getService('jwt').issue({
                                         id: user.id,
                                     }), */
