@@ -1,5 +1,7 @@
 'use strict';
 
+const session = require("koa-session2");
+
 module.exports = {
   /**
    * An asynchronous register function that runs before
